@@ -17,3 +17,8 @@ class IDInvalidoError(Exception):
     """Excepción personalizada para ID inválido."""
     def __init__(self, mensaje="ID inválido. Por favor, ingrese un número válido."):
         super().__init__(mensaje)
+
+class JuegoYaCompradoError(Exception):
+    """Excepción personalizada para juego ya comprado."""
+    def __init__(self, mensaje="El juego ya ha sido comprado."):
+        super().__init__(mensaje)
