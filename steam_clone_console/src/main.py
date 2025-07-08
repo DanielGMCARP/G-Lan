@@ -34,7 +34,6 @@ def main():
             print("Opción no válida. Intente de nuevo.")
 
     while True:
-        os.system('cls')
         print("=== Menú Principal ===")
         print("1. Mostrar catálogo")
         print("2. Biblioteca de juegos")
