@@ -1,6 +1,6 @@
 import os
 from dal import verificar_usuario, crear_usuario, obtener_catalogo, procesar_compra, obtener_biblioteca, actualizar_estado_descarga
-from errores import UsuarioNoEncontradoError, IDInvalidoError, JuegoNoEncontradoError, JuegoYaDescargadoError, ContraseñaIncorrectaError
+from errores import UsuarioNoEncontradoError, IDInvalidoError, JuegoNoEncontradoError, JuegoYaDescargadoError, ContraseñaIncorrectaError, JuegoYaCompradoError
 
 def iniciar_sesion():
     os.system('cls')
@@ -45,10 +45,12 @@ def mostrar_catalogo(id_usuario):
             if procesar_compra(id_usuario, id_juego):
                 print("Juego comprado exitosamente.")
             else:
-                print("No se pudo realizar la compra.")
+                raise JuegoYaCompradoError("Este juego ya ha sido comprado.")
         except ValueError:
-            print("ID inválido. Por favor, ingrese un número.")
+            raise IDInvalidoError("ID inválido. Por favor, ingrese un número válido.")
         except JuegoNoEncontradoError as e:
+            print(e)
+        except JuegoYaCompradoError as e:
             print(e)
     elif respuesta == "2":
         print("Regresando al menú principal...")
