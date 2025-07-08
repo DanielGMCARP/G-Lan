@@ -1,116 +1,55 @@
 import sqlite3
 
-# Conexión global a la base de datos
-conn = sqlite3.connect("steam_clone.db")
-cursor = conn.cursor()
+class Database:
+    def __init__(self, db_name="steam_clone.db"):
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
 
-# Crear las tablas
-def crear_tablas():
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        gmail TEXT NOT NULL UNIQUE,
-        contrasena TEXT NOT NULL,
-        fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
+    def crear_tablas(self):
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            gmail TEXT NOT NULL UNIQUE,
+            contrasena TEXT NOT NULL
+        );
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS juegos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        descripcion TEXT,
-        desarrollador TEXT,
-        precio REAL,
-        veces_adquirido INTEGER DEFAULT 0,
-        veces_descargado INTEGER DEFAULT 0,
-        fecha_lanzamiento DATE
-    );
-    """)
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS juegos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            precio REAL,
+            genero TEXT NOT NULL,
+            veces_adquirido INTEGER DEFAULT 0
+        );
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS adquisiciones (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario_id INTEGER,
-        juego_id INTEGER,
-        fecha_adquisicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(usuario_id, juego_id),
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-        FOREIGN KEY (juego_id) REFERENCES juegos(id)
-    );
-    """)
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS juegosBiblioteca (
+            id_biblioteca INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_usuario INTEGER NOT NULL,
+            id_juego INTEGER NOT NULL,
+            estado_descarga TEXT DEFAULT 'no descargado',
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
+            FOREIGN KEY (id_juego) REFERENCES juegos(id)
+        );
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS descargas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario_id INTEGER,
-        juego_id INTEGER,
-        fecha_descarga TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-        FOREIGN KEY (juego_id) REFERENCES juegos(id)
-    );
-    """)
-    conn.commit()
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS catalogo (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_juego INTEGER NOT NULL,
+            FOREIGN KEY (id_juego) REFERENCES juegos(id)
+        );
+        """)
+        self.conn.commit()
 
-# Agregar un nuevo usuario
-def registrar_usuario(nombre, gmail, contrasena):
-    try:
-        cursor.execute("""
-            INSERT INTO usuarios (nombre, gmail, contrasena) VALUES (?, ?, ?)
-        """, (nombre, gmail, contrasena))
-        conn.commit()
-        print("✅ Usuario registrado correctamente.")
-    except sqlite3.IntegrityError:
-        print("⚠️ El correo ya está registrado.")
+    def get_cursor(self):
+        return self.cursor
 
-# Agregar un nuevo juego
-def agregar_juego(nombre, descripcion, desarrollador, precio, fecha_lanzamiento):
-    cursor.execute("""
-        INSERT INTO juegos (nombre, descripcion, desarrollador, precio, fecha_lanzamiento)
-        VALUES (?, ?, ?, ?, ?)
-    """, (nombre, descripcion, desarrollador, precio, fecha_lanzamiento))
-    conn.commit()
-    print("🎮 Juego agregado con éxito.")
+    def commit(self):
+        self.conn.commit()
 
-# Registrar adquisición de un juego
-def adquirir_juego(usuario_id, juego_id):
-    try:
-        cursor.execute("""
-            INSERT INTO adquisiciones (usuario_id, juego_id) VALUES (?, ?)
-        """, (usuario_id, juego_id))
-
-        cursor.execute("""
-            UPDATE juegos SET veces_adquirido = veces_adquirido + 1 WHERE id = ?
-        """, (juego_id,))
-        conn.commit()
-        print("✅ Juego adquirido.")
-    except sqlite3.IntegrityError:
-        print("⚠️ El usuario ya tiene este juego.")
-
-# Registrar una descarga
-def descargar_juego(usuario_id, juego_id):
-    cursor.execute("""
-        INSERT INTO descargas (usuario_id, juego_id) VALUES (?, ?)
-    """, (usuario_id, juego_id))
-
-    cursor.execute("""
-        UPDATE juegos SET veces_descargado = veces_descargado + 1 WHERE id = ?
-    """, (juego_id,))
-    conn.commit()
-    print("⬇️ Juego descargado.")
-
-# Obtener todos los juegos
-def listar_juegos():
-    cursor.execute("SELECT * FROM juegos")
-    return cursor.fetchall()
-
-# Obtener todos los usuarios
-def listar_usuarios():
-    cursor.execute("SELECT * FROM usuarios")
-    return cursor.fetchall()
-
-# Ejecutar la creación de tablas si se corre el archivo directamente
-if __name__ == "__main__":
-    crear_tablas()
-    print("✅ Base de datos inicializada.")
+    def close(self):
+        self.conn.close()
