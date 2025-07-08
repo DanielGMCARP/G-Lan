@@ -25,6 +25,12 @@ def verificar_usuario(gmail, contrasena):
     usuario = cursor.fetchone()
     db.close()
     return usuario
+    db = Database()
+    cursor = db.get_cursor()
+    cursor.execute("SELECT * FROM usuarios WHERE gmail = ? AND contrasena = ?", (gmail, contrasena))
+    usuario = cursor.fetchone()
+    db.close()
+    return usuario is not None
 
 def obtener_catalogo():
     db = Database()

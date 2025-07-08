@@ -1,6 +1,6 @@
 import os
 from dal import verificar_usuario, crear_usuario, obtener_catalogo, procesar_compra, obtener_biblioteca, actualizar_estado_descarga
-from errores import UsuarioNoEncontradoError, IDInvalidoError, JuegoNoEncontradoError, JuegoYaDescargadoError
+from errores import UsuarioNoEncontradoError, IDInvalidoError, JuegoNoEncontradoError, JuegoYaDescargadoError, ContraseñaIncorrectaError
 
 def iniciar_sesion():
     os.system('cls')
@@ -14,6 +14,9 @@ def iniciar_sesion():
         return usuario[0]  # Retorna el ID del usuario
     else:
         raise UsuarioNoEncontradoError()
+    if contraseña != usuario[2]:
+        raise ContraseñaIncorrectaError("Contraseña incorrecta. Por favor, inténtelo de nuevo.")
+    
 
 def registrar_usuario():
     os.system('cls')

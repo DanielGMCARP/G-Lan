@@ -2,6 +2,11 @@ class UsuarioNoEncontradoError(Exception):
     """Excepción personalizada para usuario no encontrado."""
     def __init__(self, mensaje="Usuario no encontrado. Por favor, regístrese."):
         super().__init__(mensaje)
+        
+class ContraseñaIncorrectaError(Exception):
+    """Excepción personalizada para contraseña incorrecta."""
+    def __init__(self, mensaje="Contraseña incorrecta. Por favor, inténtelo de nuevo."):
+        super().__init__(mensaje)
 
 class JuegoNoEncontradoError(Exception):
     """Excepción personalizada para juego no encontrado."""
