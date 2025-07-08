@@ -12,7 +12,6 @@ def main():
 
     id_usuario = None
     while not id_usuario:
-        os.system('cls')
         print("Bienvenido a Games-Lan")
         print("1. Registrarse")
         print("2. Iniciar sesión")
