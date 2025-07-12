@@ -21,14 +21,21 @@ def iniciar_sesion():
 def registrar_usuario():
     os.system('cls')
     print("=== Registrar Usuario ===")
-    nombre = input("Ingrese su nombre: ")
-    gmail = input("Ingrese su correo electrónico: ")
-    contrasena = input("Ingrese su contraseña: ")
+    while True:
+        nombre = input("Ingrese su nombre: ").strip()
+        gmail = input("Ingrese su correo electrónico: ").strip()
+        contrasena = input("Ingrese su contraseña: ").strip()
 
-    if crear_usuario(nombre, gmail, contrasena):
-        print("Usuario registrado exitosamente.")
-    else:
-        print("Error: El correo ya está registrado.")
+        if not nombre or not gmail or not contrasena:
+            print("Todos los campos son obligatorios. Por favor, complete todos los datos.\n")
+            continue
+
+        if crear_usuario(nombre, gmail, contrasena):
+            print("Usuario registrado exitosamente.")
+            break
+        else:
+            print("Error: El correo ya está registrado.")
+            break
 
 def mostrar_catalogo(id_usuario):
     os.system('cls')
