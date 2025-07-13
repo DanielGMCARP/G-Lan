@@ -8,87 +8,87 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dal.dal import obtener_catalogo, procesar_compra, obtener_biblioteca, actualizar_estado_descarga
 
-class CatalogPanel(tk.Frame):
-    def __init__(self, parent, user_id, show_panel_callback):
+class PanelCatalogo(tk.Frame):
+    def __init__(self, parent, id_usuario, callback_mostrar_panel):
         super().__init__(parent, bg='#2b2b2b')
-        self.user_id = user_id
-        self.show_panel_callback = show_panel_callback
-        self.games = []
+        self.id_usuario = id_usuario
+        self.callback_mostrar_panel = callback_mostrar_panel
+        self.juegos = []
         self.biblioteca = []
-        self.create_widgets()
+        self.crear_widgets()
         
-    def create_widgets(self):
+    def crear_widgets(self):
         """Crear los widgets del panel de catálogo"""
-        # Header
-        header_frame = tk.Frame(self, bg='#2b2b2b')
-        header_frame.pack(fill='x', pady=10)
+        # Encabezado
+        marco_encabezado = tk.Frame(self, bg='#2b2b2b')
+        marco_encabezado.pack(fill='x', pady=10)
         
-        title_label = tk.Label(
-            header_frame,
+        etiqueta_titulo = tk.Label(
+            marco_encabezado,
             text="📚 Catálogo de Juegos",
             font=('Arial', 18, 'bold'),
             fg='#4a90e2',
             bg='#2b2b2b'
         )
-        title_label.pack(side='left')
+        etiqueta_titulo.pack(side='left')
         
-        back_btn = tk.Button(
-            header_frame,
+        boton_volver = tk.Button(
+            marco_encabezado,
             text="← Volver al Menú",
-            command=lambda: self.show_panel_callback('menu'),
+            command=lambda: self.callback_mostrar_panel('menu'),
             bg='#6c757d',
             fg='white',
             font=('Arial', 10, 'bold'),
             relief='flat'
         )
-        back_btn.pack(side='right')
+        boton_volver.pack(side='right')
         
-        # Frame para la lista de juegos
-        self.games_frame = tk.Frame(self, bg='#2b2b2b')
-        self.games_frame.pack(fill='both', expand=True, pady=10)
+        # Marco para la lista de juegos
+        self.marco_juegos = tk.Frame(self, bg='#2b2b2b')
+        self.marco_juegos.pack(fill='both', expand=True, pady=10)
         
         # Crear Treeview para mostrar los juegos
-        columns = ('ID', 'Nombre', 'Precio', 'Género', 'Acción')
-        self.tree = ttk.Treeview(self.games_frame, columns=columns, show='headings', height=15)
+        columnas = ('ID', 'Nombre', 'Precio', 'Género', 'Acción')
+        self.arbol = ttk.Treeview(self.marco_juegos, columns=columnas, show='headings', height=15)
         
         # Configurar columnas
-        self.tree.heading('ID', text='ID')
-        self.tree.heading('Nombre', text='Nombre')
-        self.tree.heading('Precio', text='Precio')
-        self.tree.heading('Género', text='Género')
-        self.tree.heading('Acción', text='Acción')
+        self.arbol.heading('ID', text='ID')
+        self.arbol.heading('Nombre', text='Nombre')
+        self.arbol.heading('Precio', text='Precio')
+        self.arbol.heading('Género', text='Género')
+        self.arbol.heading('Acción', text='Acción')
         
-        self.tree.column('ID', width=50, anchor='center')
-        self.tree.column('Nombre', width=200, anchor='w')
-        self.tree.column('Precio', width=100, anchor='center')
-        self.tree.column('Género', width=150, anchor='w')
-        self.tree.column('Acción', width=150, anchor='center')
+        self.arbol.column('ID', width=50, anchor='center')
+        self.arbol.column('Nombre', width=200, anchor='w')
+        self.arbol.column('Precio', width=100, anchor='center')
+        self.arbol.column('Género', width=150, anchor='w')
+        self.arbol.column('Acción', width=150, anchor='center')
         
-        # Scrollbar
-        scrollbar = ttk.Scrollbar(self.games_frame, orient='vertical', command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scrollbar.set)
+        # Barra de desplazamiento
+        barra_desplazamiento = ttk.Scrollbar(self.marco_juegos, orient='vertical', command=self.arbol.yview)
+        self.arbol.configure(yscrollcommand=barra_desplazamiento.set)
         
         # Empaquetar Treeview y scrollbar
-        self.tree.pack(side='left', fill='both', expand=True)
-        scrollbar.pack(side='right', fill='y')
+        self.arbol.pack(side='left', fill='both', expand=True)
+        barra_desplazamiento.pack(side='right', fill='y')
         
         # Configurar estilo del Treeview
-        style = ttk.Style()
-        style.configure("Treeview", 
+        estilo = ttk.Style()
+        estilo.configure("Treeview", 
                        background="#3c3c3c",
                        foreground="white",
                        fieldbackground="#3c3c3c",
                        rowheight=30)
-        style.configure("Treeview.Heading", 
+        estilo.configure("Treeview.Heading", 
                        background="#4a90e2",
                        foreground="white",
                        font=('Arial', 10, 'bold'))
         
         # Botón de actualizar
-        refresh_btn = tk.Button(
+        boton_actualizar = tk.Button(
             self,
             text="🔄 Actualizar Catálogo",
-            command=self.load_catalog,
+            command=self.cargar_catalogo,
             bg='#17a2b8',
             fg='white',
             font=('Arial', 10, 'bold'),
@@ -96,66 +96,66 @@ class CatalogPanel(tk.Frame):
             padx=20,
             pady=10
         )
-        refresh_btn.pack(pady=10)
+        boton_actualizar.pack(pady=10)
         
-    def set_user_id(self, user_id):
+    def establecer_id_usuario(self, id_usuario):
         """Establecer el ID del usuario"""
-        self.user_id = user_id
+        self.id_usuario = id_usuario
         
-    def load_catalog(self):
+    def cargar_catalogo(self):
         """Cargar el catálogo de juegos"""
         try:
             # Limpiar la lista actual
-            for item in self.tree.get_children():
-                self.tree.delete(item)
+            for elemento in self.arbol.get_children():
+                self.arbol.delete(elemento)
             # Obtener juegos de la base de datos
-            self.games = obtener_catalogo()
-            self.biblioteca = obtener_biblioteca(self.user_id) if self.user_id else []
+            self.juegos = obtener_catalogo()
+            self.biblioteca = obtener_biblioteca(self.id_usuario) if self.id_usuario else []
             juegos_biblioteca = {nombre: estado for _, nombre, estado in self.biblioteca}
             # Agregar juegos al Treeview
-            for game in self.games:
-                game_id, name, price, genre = game
+            for juego in self.juegos:
+                id_juego, nombre, precio, genero = juego
                 accion = "Comprar"
-                if name in juegos_biblioteca:
-                    if juegos_biblioteca[name] == 'descargado':
+                if nombre in juegos_biblioteca:
+                    if juegos_biblioteca[nombre] == 'descargado':
                         accion = "Descargado"
                     else:
                         accion = "Descargar"
-                item = self.tree.insert('', 'end', values=(game_id, name, f"${price}", genre, accion))
+                elemento = self.arbol.insert('', 'end', values=(id_juego, nombre, f"${precio}", genero, accion))
             # Vincular evento de doble clic
-            self.tree.bind('<Double-1>', self.on_double_click)
+            self.arbol.bind('<Double-1>', self.al_hacer_doble_clic)
         except Exception as e:
             messagebox.showerror("Error", f"Error al cargar el catálogo: {str(e)}")
             
-    def on_double_click(self, event):
-        item_id = self.tree.focus()
-        if not item_id:
+    def al_hacer_doble_clic(self, evento):
+        id_elemento = self.arbol.focus()
+        if not id_elemento:
             return
-        values = self.tree.item(item_id, 'values')
-        if not values:
+        valores = self.arbol.item(id_elemento, 'values')
+        if not valores:
             return
-        game_id, name, price, genre, accion = values
+        id_juego, nombre, precio, genero, accion = valores
         if accion == "Comprar":
-            self.buy_game(int(game_id))
+            self.comprar_juego(int(id_juego))
         elif accion == "Descargar":
-            self.download_game(int(game_id), name)
+            self.descargar_juego(int(id_juego), nombre)
         else:
-            messagebox.showinfo("Info", "Este juego ya está descargado.")
+            messagebox.showinfo("Información", "Este juego ya está descargado.")
     
-    def buy_game(self, game_id):
-        if not self.user_id:
+    def comprar_juego(self, id_juego):
+        if not self.id_usuario:
             messagebox.showerror("Error", "Debe iniciar sesión para comprar juegos.")
             return
         try:
-            if procesar_compra(self.user_id, game_id):
+            if procesar_compra(self.id_usuario, id_juego):
                 messagebox.showinfo("Éxito", "Juego comprado exitosamente.")
-                self.load_catalog()
+                self.cargar_catalogo()
             else:
                 messagebox.showerror("Error", "No se pudo procesar la compra.")
         except Exception as e:
             messagebox.showerror("Error", f"Error al comprar el juego: {str(e)}")
     
-    def download_game(self, game_id, name):
+    def descargar_juego(self, id_juego, nombre):
         # En vez de actualizar el estado aquí, redirige al panel de descargas y selecciona el juego
-        messagebox.showinfo("Descarga", f"Para descargar '{name}', ve al panel de descargas donde verás la barra de progreso.")
-        self.show_panel_callback('download') 
+        messagebox.showinfo("Descarga", f"Para descargar '{nombre}', ve al panel de descargas donde verás la barra de progreso.")
+        self.callback_mostrar_panel('download') 

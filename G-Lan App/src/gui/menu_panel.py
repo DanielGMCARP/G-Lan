@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-class MenuPanel(tk.Frame):
+class PanelMenu(tk.Frame):
     def __init__(self, parent, show_panel_callback, user_name=None):
         super().__init__(parent, bg='#2b2b2b')
         self.show_panel_callback = show_panel_callback

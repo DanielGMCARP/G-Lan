@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dal.dal import obtener_biblioteca, actualizar_estado_descarga
 
-class DownloadPanel(tk.Frame):
+class PanelDescarga(tk.Frame):
     def __init__(self, parent, user_id, show_panel_callback, start_download_callback, download_lock):
         super().__init__(parent, bg='#2b2b2b')
         self.user_id = user_id
@@ -24,7 +24,7 @@ class DownloadPanel(tk.Frame):
         
     def create_widgets(self):
         """Crear los widgets del panel de descargas"""
-        # Header
+        # Encabezado
         header_frame = tk.Frame(self, bg='#2b2b2b')
         header_frame.pack(fill='x', pady=10)
         
@@ -77,7 +77,7 @@ class DownloadPanel(tk.Frame):
         )
         self.games_listbox.pack(fill='both', expand=True)
         
-        # Scrollbar para la lista
+        # Barra de desplazamiento para la lista
         list_scrollbar = tk.Scrollbar(left_frame, orient='vertical', command=self.games_listbox.yview)
         self.games_listbox.configure(yscrollcommand=list_scrollbar.set)
         list_scrollbar.pack(side='right', fill='y')
@@ -219,10 +219,10 @@ class DownloadPanel(tk.Frame):
             messagebox.showerror("Error", "No se pudo obtener el ID del juego.")
             return
         if estado_actual == 'descargado':
-            messagebox.showinfo("Info", "El juego ya está descargado.")
+            messagebox.showinfo("Información", "El juego ya está descargado.")
             return
         if estado_actual == 'descargandose':
-            messagebox.showinfo("Info", "El juego ya se está descargando.")
+            messagebox.showinfo("Información", "El juego ya se está descargando.")
             return
         # Cambiar estado a 'descargandose'
         try:

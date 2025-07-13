@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dal.dal import verificar_usuario, crear_usuario
 
-class LoginPanel(tk.Frame):
+class PanelInicioSesion(tk.Frame):
     def __init__(self, parent, on_login_success, on_go_to_register):
         super().__init__(parent, bg='#2b2b2b')
         self.on_login_success = on_login_success
@@ -46,7 +46,7 @@ class LoginPanel(tk.Frame):
         self.password_var = tk.StringVar()
         
         # Campos de entrada
-        tk.Label(form_frame, text="Email:", fg='white', bg='#2b2b2b', font=('Arial', 10)).pack(anchor='w')
+        tk.Label(form_frame, text="Correo electrónico:", fg='white', bg='#2b2b2b', font=('Arial', 10)).pack(anchor='w')
         self.email_entry = tk.Entry(form_frame, textvariable=self.email_var, width=30, font=('Arial', 10))
         self.email_entry.pack(pady=5, fill='x')
         
@@ -96,11 +96,15 @@ class LoginPanel(tk.Frame):
             if user:
                 self.on_login_success(user[0], user[1])  # user_id, user_name
             else:
-                messagebox.showerror("Error", "Email o contraseña incorrectos.")
+                messagebox.showerror("Error", "Correo electrónico o contraseña incorrectos.")
         except Exception as e:
-            messagebox.showerror("Error", f"Error durante el login: {str(e)}")
+            messagebox.showerror("Error", f"Error durante el inicio de sesión: {str(e)}")
             
     def clear_fields(self):
         """Limpiar todos los campos del formulario"""
         self.email_var.set("")
-        self.password_var.set("") 
+        self.password_var.set("")
+        
+    def reset_panel(self):
+        """Resetear el panel cuando se vuelve al login"""
+        self.clear_fields() 

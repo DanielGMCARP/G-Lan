@@ -9,26 +9,26 @@ import os
 # Agregar el directorio padre al path para importar los módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from gui.login_panel import LoginPanel
-from gui.register_panel import RegisterPanel
-from gui.menu_panel import MenuPanel
-from gui.catalog_panel import CatalogPanel
-from gui.library_panel import LibraryPanel
-from gui.download_panel import DownloadPanel
+from gui.login_panel import PanelInicioSesion
+from gui.register_panel import PanelRegistro
+from gui.menu_panel import PanelMenu
+from gui.catalog_panel import PanelCatalogo
+from gui.library_panel import PanelBiblioteca
+from gui.download_panel import PanelDescarga
 from dal.dal import crear_usuario, verificar_usuario, obtener_catalogo, procesar_compra, obtener_biblioteca, actualizar_estado_descarga, desinstalar_juego
-from bd.db import Database
+from bd.db import BaseDatos
 
-def notification_process(user_name):
+def proceso_notificacion(nombre_usuario):
     time.sleep(1)
     # El messagebox solo funciona en el proceso principal, así que solo imprime
-    print(f"[PROCESO] ¡Bienvenido a Games-Lan, {user_name}!")
+    print(f"[PROCESO] ¡Bienvenido a Games-Lan, {nombre_usuario}!")
 
-def backup_process():
+def proceso_backup():
     import time
     time.sleep(2)
     print("[PROCESO] Backup automático completado")
 
-class GamesLanGUI:
+class InterfazGamesLan:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Games-Lan")
@@ -82,42 +82,42 @@ class GamesLanGUI:
     def create_panels(self):
         """Crear todos los paneles de la aplicación"""
         # Panel de login
-        self.panels['login'] = LoginPanel(
+        self.panels['login'] = PanelInicioSesion(
             self.main_container, 
             self.on_login_success,
             self.go_to_register
         )
         
         # Panel de registro
-        self.panels['register'] = RegisterPanel(
+        self.panels['register'] = PanelRegistro(
             self.main_container,
             self.on_register_success,
             self.go_to_login
         )
         
         # Panel del menú principal
-        self.panels['menu'] = MenuPanel(
+        self.panels['menu'] = PanelMenu(
             self.main_container,
             self.show_panel,
             self.current_user_name
         )
         
         # Panel del catálogo
-        self.panels['catalog'] = CatalogPanel(
+        self.panels['catalog'] = PanelCatalogo(
             self.main_container,
             self.current_user_id,
             self.show_panel
         )
         
         # Panel de biblioteca
-        self.panels['library'] = LibraryPanel(
+        self.panels['library'] = PanelBiblioteca(
             self.main_container,
             self.current_user_id,
             self.show_panel
         )
         
         # Panel de descargas
-        self.panels['download'] = DownloadPanel(
+        self.panels['download'] = PanelDescarga(
             self.main_container,
             self.current_user_id,
             self.show_panel,
@@ -141,7 +141,7 @@ class GamesLanGUI:
             
         # Actualizar datos en paneles específicos
         if panel_name == 'catalog' and self.current_user_id:
-            self.panels['catalog'].load_catalog()
+            self.panels['catalog'].cargar_catalogo()
         elif panel_name == 'library' and self.current_user_id:
             self.panels['library'].load_library()
             
@@ -151,7 +151,7 @@ class GamesLanGUI:
         self.current_user_name = user_name
         
         # Actualizar paneles con el ID del usuario
-        self.panels['catalog'].set_user_id(user_id)
+        self.panels['catalog'].establecer_id_usuario(user_id)
         self.panels['library'].set_user_id(user_id)
         self.panels['download'].set_user_id(user_id)
         
@@ -167,7 +167,7 @@ class GamesLanGUI:
         
     def launch_notification_process(self, user_name):
         """Lanzar proceso de notificación en background"""
-        process = multiprocessing.Process(target=notification_process, args=(user_name,))
+        process = multiprocessing.Process(target=proceso_notificacion, args=(user_name,))
         process.start()
         
     def start_download(self, game_id):
@@ -198,7 +198,7 @@ class GamesLanGUI:
             
     def launch_backup_process(self):
         """Lanzar proceso de backup en background"""
-        process = multiprocessing.Process(target=backup_process)
+        process = multiprocessing.Process(target=proceso_backup)
         process.start()
         
     def go_to_register(self):
@@ -207,12 +207,15 @@ class GamesLanGUI:
         
     def go_to_login(self):
         """Ir al panel de login"""
+        # Limpiar campos del login
+        if 'login' in self.panels:
+            self.panels['login'].reset_panel()
         self.show_panel('login')
         
     def run(self):
         """Ejecutar la aplicación"""
         # Crear las tablas de la base de datos
-        db = Database()
+        db = BaseDatos()
         db.crear_tablas()
         db.close()
         
@@ -223,5 +226,5 @@ class GamesLanGUI:
         self.root.mainloop()
 
 if __name__ == "__main__":
-    app = GamesLanGUI()
+    app = InterfazGamesLan()
     app.run() 

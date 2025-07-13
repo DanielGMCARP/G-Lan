@@ -1,1 +1,1 @@
-# GUI Package for Games-Lan 
+# Paquete GUI para Games-Lan 

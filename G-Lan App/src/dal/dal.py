@@ -1,9 +1,9 @@
 import sqlite3
-from bd.db import Database
+from bd.db import BaseDatos
 from errores import JuegoNoEncontradoError, JuegoYaDescargadoError, JuegoYaCompradoError
 
 def crear_usuario(nombre, gmail, contrasena):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     try:
         cursor.execute("INSERT INTO usuarios (nombre, gmail, contrasena) VALUES (?, ?, ?)", (nombre, gmail, contrasena))
@@ -19,7 +19,7 @@ def crear_usuario(nombre, gmail, contrasena):
     return True
 
 def verificar_usuario(gmail, contrasena):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     cursor.execute("SELECT * FROM usuarios WHERE gmail = ? AND contrasena = ?", (gmail, contrasena))
     usuario = cursor.fetchone()
@@ -27,7 +27,7 @@ def verificar_usuario(gmail, contrasena):
     return usuario
 
 def obtener_catalogo():
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     cursor.execute("SELECT id, nombre, precio, genero FROM juegos")
     juegos = cursor.fetchall()
@@ -35,7 +35,7 @@ def obtener_catalogo():
     return juegos
 
 def procesar_compra(id_usuario, id_juego):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
 
     cursor.execute("SELECT id FROM juegos WHERE id = ?", (id_juego,))
@@ -62,7 +62,7 @@ def procesar_compra(id_usuario, id_juego):
     return True
 
 def obtener_biblioteca(id_usuario):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     cursor.execute("""
     SELECT juegos.id, juegos.nombre, juegosBiblioteca.estado_descarga
@@ -75,7 +75,7 @@ def obtener_biblioteca(id_usuario):
     return biblioteca
 
 def actualizar_estado_descarga(id_usuario, id_juego, nuevo_estado='descargado'):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     cursor.execute("""
     SELECT estado_descarga FROM juegosBiblioteca
@@ -98,7 +98,7 @@ def actualizar_estado_descarga(id_usuario, id_juego, nuevo_estado='descargado'):
     print(f"El estado del juego con ID {id_juego} ha sido actualizado a '{nuevo_estado}'.")
 
 def desinstalar_juego(id_usuario, id_juego):
-    db = Database()
+    db = BaseDatos()
     cursor = db.get_cursor()
     cursor.execute("""
     UPDATE juegosBiblioteca
@@ -108,61 +108,3 @@ def desinstalar_juego(id_usuario, id_juego):
     db.commit()
     db.close()
     print(f"Juego con ID {id_juego} marcado como pendiente para el usuario {id_usuario}.")
-
-def eliminar_usuario(id_usuario):
-    """
-    Elimina un usuario y todos sus registros relacionados de forma segura
-    """
-    db = Database()
-    cursor = db.get_cursor()
-    
-    try:
-        # Primero verificar que el usuario existe
-        cursor.execute("SELECT id FROM usuarios WHERE id = ?", (id_usuario,))
-        usuario = cursor.fetchone()
-        if not usuario:
-            print(f"Usuario con ID {id_usuario} no encontrado.")
-            return False
-        
-        # Eliminar registros de la biblioteca del usuario
-        cursor.execute("DELETE FROM juegosBiblioteca WHERE id_usuario = ?", (id_usuario,))
-        registros_eliminados = cursor.rowcount
-        
-        # Eliminar el usuario
-        cursor.execute("DELETE FROM usuarios WHERE id = ?", (id_usuario,))
-        
-        db.commit()
-        print(f"Usuario con ID {id_usuario} eliminado exitosamente.")
-        print(f"Se eliminaron {registros_eliminados} registros de la biblioteca.")
-        return True
-        
-    except sqlite3.Error as e:
-        print(f"Error al eliminar usuario: {e}")
-        db.rollback()
-        return False
-    finally:
-        db.close()
-
-def eliminar_usuario_por_email(email):
-    """
-    Elimina un usuario por su email de forma segura
-    """
-    db = Database()
-    cursor = db.get_cursor()
-    
-    try:
-        # Buscar el usuario por email
-        cursor.execute("SELECT id FROM usuarios WHERE gmail = ?", (email,))
-        usuario = cursor.fetchone()
-        if not usuario:
-            print(f"Usuario con email {email} no encontrado.")
-            return False
-        
-        id_usuario = usuario[0]
-        return eliminar_usuario(id_usuario)
-        
-    except sqlite3.Error as e:
-        print(f"Error al buscar usuario: {e}")
-        return False
-    finally:
-        db.close()

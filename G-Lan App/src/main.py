@@ -3,7 +3,7 @@ import sys
 import threading
 import multiprocessing
 import time
-from db import Database
+from bd.db import BaseDatos
 from gui import iniciar_sesion, registrar_usuario, mostrar_catalogo, mostrar_biblioteca, descargar_juego
 from errores import UsuarioNoEncontradoError, JuegoNoEncontradoError, IDInvalidoError
 from dal import crear_usuario, verificar_usuario
@@ -13,17 +13,23 @@ hilo_descarga_activo = None
 hilo_lock = threading.Lock()
 
 def proceso_backup():
-    print('[PROCESO] Backup automático ejecutándose...')
+    print('[PROCESO HIJO] Backup automático ejecutándose...')
+    print(f'[PROCESO HIJO] PID: {os.getpid()}')
+    print(f'[PROCESO HIJO] PID del padre: {os.getppid()}')
     time.sleep(2)
-    print('[PROCESO] Backup finalizado.')
+    print('[PROCESO HIJO] Backup finalizado.')
 
 def proceso_notificacion(nombre_usuario):
-    print(f'[PROCESO] ¡Bienvenido, {nombre_usuario}! (Notificación especial)')
+    print(f'[PROCESO HIJO] ¡Bienvenido, {nombre_usuario}! (Notificación especial)')
+    print(f'[PROCESO HIJO] PID: {os.getpid()}')
+    print(f'[PROCESO HIJO] PID del padre: {os.getppid()}')
     time.sleep(1)
-    print('[PROCESO] Notificación mostrada.')
+    print('[PROCESO HIJO] Notificación mostrada.')
 
 def proceso_registro(nombre, gmail, contrasena, q):
-    print('[PROCESO] Registro de usuario')
+    print('[PROCESO HIJO] Registro de usuario')
+    print(f'[PROCESO HIJO] PID: {os.getpid()}')
+    print(f'[PROCESO HIJO] PID del padre: {os.getppid()}')
     if not nombre or not gmail or not contrasena:
         q.put((False, "Todos los campos son obligatorios."))
         return
@@ -34,7 +40,9 @@ def proceso_registro(nombre, gmail, contrasena, q):
         q.put((False, "Error: El correo ya está registrado."))
 
 def proceso_login(gmail, contrasena, q):
-    print('[PROCESO] Inicio de sesión')
+    print('[PROCESO HIJO] Inicio de sesión')
+    print(f'[PROCESO HIJO] PID: {os.getpid()}')
+    print(f'[PROCESO HIJO] PID del padre: {os.getppid()}')
     usuario = verificar_usuario(gmail, contrasena)
     if usuario:
         q.put((True, usuario[0], usuario[1]))  # id_usuario, nombre
@@ -61,7 +69,11 @@ def descarga_con_hilo(id_usuario):
         return hilo_descarga_activo
 
 def main():
-    db = Database()
+    print('[PROCESO PRINCIPAL] Proceso principal de Games-Lan')
+    print(f'[PROCESO PRINCIPAL] PID: {os.getpid()}')
+    print(f'[PROCESO PRINCIPAL] PID del padre: {os.getppid()}')
+
+    db = BaseDatos()
     db.crear_tablas()
     db.close()
 

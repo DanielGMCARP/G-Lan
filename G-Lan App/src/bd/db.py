@@ -1,6 +1,6 @@
 import sqlite3
 
-class Database:
+class BaseDatos:
     def __init__(self, db_name="steam_clone.db"):
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()

@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dal.dal import crear_usuario, verificar_usuario
 
-class RegisterPanel(tk.Frame):
+class PanelRegistro(tk.Frame):
     def __init__(self, parent, on_register_success, on_back_to_login):
         super().__init__(parent, bg='#2b2b2b')
         self.on_register_success = on_register_success
@@ -43,7 +43,7 @@ class RegisterPanel(tk.Frame):
         self.name_entry = tk.Entry(form_frame, textvariable=self.name_var, width=30, font=('Arial', 10))
         self.name_entry.pack(pady=5, fill='x')
         
-        tk.Label(form_frame, text="Email:", fg='white', bg='#2b2b2b', font=('Arial', 10)).pack(anchor='w', pady=(10,0))
+        tk.Label(form_frame, text="Correo electrónico:", fg='white', bg='#2b2b2b', font=('Arial', 10)).pack(anchor='w', pady=(10,0))
         self.email_entry = tk.Entry(form_frame, textvariable=self.email_var, width=30, font=('Arial', 10))
         self.email_entry.pack(pady=5, fill='x')
         
@@ -103,9 +103,9 @@ class RegisterPanel(tk.Frame):
             messagebox.showerror("Error", "La contraseña debe tener al menos 6 caracteres.")
             return
             
-        # Validar formato de email básico
+        # Validar formato de correo electrónico básico
         if '@' not in email or '.' not in email:
-            messagebox.showerror("Error", "Por favor ingrese un email válido.")
+            messagebox.showerror("Error", "Por favor ingrese un correo electrónico válido.")
             return
             
         try:
@@ -118,7 +118,7 @@ class RegisterPanel(tk.Frame):
                 else:
                     messagebox.showerror("Error", "Error al obtener datos del usuario registrado.")
             else:
-                messagebox.showerror("Error", "El email ya está registrado.")
+                messagebox.showerror("Error", "El correo electrónico ya está registrado.")
         except Exception as e:
             messagebox.showerror("Error", f"Error durante el registro: {str(e)}")
             

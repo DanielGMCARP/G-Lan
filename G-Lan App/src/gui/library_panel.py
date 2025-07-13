@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dal.dal import obtener_biblioteca, desinstalar_juego, actualizar_estado_descarga
 
-class LibraryPanel(tk.Frame):
+class PanelBiblioteca(tk.Frame):
     def __init__(self, parent, user_id, show_panel_callback):
         super().__init__(parent, bg='#2b2b2b')
         self.user_id = user_id
@@ -19,7 +19,7 @@ class LibraryPanel(tk.Frame):
         
     def create_widgets(self):
         """Crear los widgets del panel de biblioteca"""
-        # Header
+        # Encabezado
         header_frame = tk.Frame(self, bg='#2b2b2b')
         header_frame.pack(fill='x', pady=10)
         
@@ -60,7 +60,7 @@ class LibraryPanel(tk.Frame):
         self.tree.column('Estado de Descarga', width=200, anchor='center')
         self.tree.column('Acción', width=150, anchor='center')
         
-        # Scrollbar
+        # Barra de desplazamiento
         scrollbar = ttk.Scrollbar(self.games_frame, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
         
@@ -136,7 +136,7 @@ class LibraryPanel(tk.Frame):
                     actualizar_estado_descarga(self.user_id, gid, 'pendiente')
                     juegos_reset += 1
             if juegos_reset > 0:
-                messagebox.showinfo("Descargas reiniciadas", f"{juegos_reset} juego(s) atascado(s) en 'descargandose' fueron reiniciados a 'pendiente'.")
+                messagebox.showinfo("Descargas reiniciadas", f"{juegos_reset} juego(s) atascado(s) en 'descargándose' fueron reiniciados a 'pendiente'.")
             # Limpiar la lista actual
             for item in self.tree.get_children():
                 self.tree.delete(item)
