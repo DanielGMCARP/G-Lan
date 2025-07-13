@@ -108,3 +108,61 @@ def desinstalar_juego(id_usuario, id_juego):
     db.commit()
     db.close()
     print(f"Juego con ID {id_juego} marcado como pendiente para el usuario {id_usuario}.")
+
+def eliminar_usuario(id_usuario):
+    """
+    Elimina un usuario y todos sus registros relacionados de forma segura
+    """
+    db = Database()
+    cursor = db.get_cursor()
+    
+    try:
+        # Primero verificar que el usuario existe
+        cursor.execute("SELECT id FROM usuarios WHERE id = ?", (id_usuario,))
+        usuario = cursor.fetchone()
+        if not usuario:
+            print(f"Usuario con ID {id_usuario} no encontrado.")
+            return False
+        
+        # Eliminar registros de la biblioteca del usuario
+        cursor.execute("DELETE FROM juegosBiblioteca WHERE id_usuario = ?", (id_usuario,))
+        registros_eliminados = cursor.rowcount
+        
+        # Eliminar el usuario
+        cursor.execute("DELETE FROM usuarios WHERE id = ?", (id_usuario,))
+        
+        db.commit()
+        print(f"Usuario con ID {id_usuario} eliminado exitosamente.")
+        print(f"Se eliminaron {registros_eliminados} registros de la biblioteca.")
+        return True
+        
+    except sqlite3.Error as e:
+        print(f"Error al eliminar usuario: {e}")
+        db.rollback()
+        return False
+    finally:
+        db.close()
+
+def eliminar_usuario_por_email(email):
+    """
+    Elimina un usuario por su email de forma segura
+    """
+    db = Database()
+    cursor = db.get_cursor()
+    
+    try:
+        # Buscar el usuario por email
+        cursor.execute("SELECT id FROM usuarios WHERE gmail = ?", (email,))
+        usuario = cursor.fetchone()
+        if not usuario:
+            print(f"Usuario con email {email} no encontrado.")
+            return False
+        
+        id_usuario = usuario[0]
+        return eliminar_usuario(id_usuario)
+        
+    except sqlite3.Error as e:
+        print(f"Error al buscar usuario: {e}")
+        return False
+    finally:
+        db.close()

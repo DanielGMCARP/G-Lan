@@ -42,8 +42,8 @@ class Database:
             id_usuario INTEGER NOT NULL,
             id_juego INTEGER NOT NULL,
             estado_descarga TEXT DEFAULT 'no descargado',
-            FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-            FOREIGN KEY (id_juego) REFERENCES juegos(id)
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (id_juego) REFERENCES juegos(id) ON DELETE CASCADE
         );
         """)
 
@@ -62,7 +62,43 @@ class Database:
             ("Fortnite", 0.0, "Battle Royale"),
             ("League of Legends", 0.0, "MOBA"),
             ("Valorant", 0.0, "FPS"),
-            ("The Witcher 3", 30.0, "RPG")
+            ("The Witcher 3", 30.0, "RPG"),
+            ("Counter-Strike: Global Offensive", 0.0, "FPS"),
+            ("Among Us", 5.0, "Party"),
+            ("Stardew Valley", 15.0, "Simulation"),
+            ("Terraria", 10.0, "Adventure"),
+            ("Celeste", 20.0, "Platformer"),
+            ("Hollow Knight", 15.0, "Metroidvania"),
+            ("Apex Legends", 0.0, "Battle Royale"),
+            ("Dota 2", 0.0, "MOBA"),
+            ("Genshin Impact", 0.0, "Action RPG"),
+            ("Call of Duty: Warzone", 0.0, "FPS"),
+            ("Fall Guys", 20.0, "Party"),
+            ("Rocket League", 20.0, "Sports"),
+            ("Dead by Daylight", 20.0, "Horror"),
+            ("ARK: Survival Evolved", 30.0, "Survival"),
+            ("Rust", 40.0, "Survival"),
+            ("Cyberpunk 2077", 60.0, "RPG"),
+            ("Assassin's Creed Valhalla", 60.0, "Action RPG"),
+            ("Ghost of Tsushima", 60.0, "Action Adventure"),
+            ("Hades", 20.0, "Roguelike"),
+            ("Slay the Spire", 15.0, "Card Game"),
+            ("Ori and the Will of the Wisps", 30.0, "Platformer"),
+            ("Monster Hunter: World", 40.0, "Action RPG"),
+            ("Final Fantasy XIV", 15.0, "MMORPG"),
+            ("World of Warcraft", 15.0, "MMORPG"),
+            ("The Elder Scrolls V: Skyrim", 30.0, "RPG"),
+            ("Dark Souls III", 40.0, "Action RPG"),
+            ("Sekiro: Shadows Die Twice", 60.0, "Action RPG"),
+            ("Bloodborne", 40.0, "Action RPG"),
+            ("Persona 5 Royal", 60.0, "JRPG"),
+            ("Nioh 2", 40.0, "Action RPG"),
+            ("Monster Hunter Rise", 40.0, "Action RPG"),
+            ("Ghostrunner", 30.0, "Action"),
+            ("Control", 30.0, "Action Adventure"),
+            ("Death Stranding", 60.0, "Adventure"),
+            ("Returnal", 70.0, "Roguelike"),
+            ("Ratchet & Clank: Rift Apart", 60.0, "Action Adventure")
         ]
 
         for juego in juegos_predeterminados:
