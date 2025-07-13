@@ -1,5 +1,5 @@
 import sqlite3
-from db import Database
+from bd.db import Database
 from errores import JuegoNoEncontradoError, JuegoYaDescargadoError, JuegoYaCompradoError
 
 def crear_usuario(nombre, gmail, contrasena):
@@ -25,17 +25,11 @@ def verificar_usuario(gmail, contrasena):
     usuario = cursor.fetchone()
     db.close()
     return usuario
-    db = Database()
-    cursor = db.get_cursor()
-    cursor.execute("SELECT * FROM usuarios WHERE gmail = ? AND contrasena = ?", (gmail, contrasena))
-    usuario = cursor.fetchone()
-    db.close()
-    return usuario is not None
 
 def obtener_catalogo():
     db = Database()
     cursor = db.get_cursor()
-    cursor.execute("SELECT * FROM juegos")
+    cursor.execute("SELECT id, nombre, precio, genero FROM juegos")
     juegos = cursor.fetchall()
     db.close()
     return juegos
@@ -71,7 +65,7 @@ def obtener_biblioteca(id_usuario):
     db = Database()
     cursor = db.get_cursor()
     cursor.execute("""
-    SELECT juegos.nombre, juegosBiblioteca.estado_descarga
+    SELECT juegos.id, juegos.nombre, juegosBiblioteca.estado_descarga
     FROM juegosBiblioteca
     JOIN juegos ON juegosBiblioteca.id_juego = juegos.id
     WHERE juegosBiblioteca.id_usuario = ?
@@ -80,7 +74,7 @@ def obtener_biblioteca(id_usuario):
     db.close()
     return biblioteca
 
-def actualizar_estado_descarga(id_usuario, id_juego):
+def actualizar_estado_descarga(id_usuario, id_juego, nuevo_estado='descargado'):
     db = Database()
     cursor = db.get_cursor()
     cursor.execute("""
@@ -91,15 +85,26 @@ def actualizar_estado_descarga(id_usuario, id_juego):
     if not estado:
         db.close()
         raise JuegoNoEncontradoError()
-    if estado[0] == "descargado":
+    if estado[0] == nuevo_estado:
         db.close()
         raise JuegoYaDescargadoError()
-
     cursor.execute("""
     UPDATE juegosBiblioteca
-    SET estado_descarga = 'descargado'
+    SET estado_descarga = ?
+    WHERE id_usuario = ? AND id_juego = ?
+    """, (nuevo_estado, id_usuario, id_juego))
+    db.commit()
+    db.close()
+    print(f"El estado del juego con ID {id_juego} ha sido actualizado a '{nuevo_estado}'.")
+
+def desinstalar_juego(id_usuario, id_juego):
+    db = Database()
+    cursor = db.get_cursor()
+    cursor.execute("""
+    UPDATE juegosBiblioteca
+    SET estado_descarga = 'pendiente'
     WHERE id_usuario = ? AND id_juego = ?
     """, (id_usuario, id_juego))
     db.commit()
     db.close()
-    print(f"El estado del juego con ID {id_juego} ha sido actualizado a 'descargado'.")
+    print(f"Juego con ID {id_juego} marcado como pendiente para el usuario {id_usuario}.")

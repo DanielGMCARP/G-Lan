@@ -70,10 +70,11 @@ def mostrar_biblioteca(id_usuario):
     for juego in biblioteca:
         print(f"Nombre: {juego[0]}, Estado de descarga: {juego[1]}")
 
-def descargar_juego(id_usuario):
+def descargar_juego(id_usuario, id_juego=None):
     print("=== Descargar Juego ===")
     try:
-        id_juego = int(input("Ingrese el ID del juego que desea descargar: "))
+        if id_juego is None:
+            id_juego = int(input("Ingrese el ID del juego que desea descargar: "))
         actualizar_estado_descarga(id_usuario, id_juego)
     except ValueError:
         raise IDInvalidoError()
